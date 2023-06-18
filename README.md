@@ -34,59 +34,72 @@ You can also set token at runtime.
 ### ارسال مشتری به درگاه پرداخت | Send customer to payment gateway
 
 ```php
-$response = sama()
-    ->token('abcd') // تعیین توکن در حین اجرا - اختیاری
-    ->amount(100) // مبلغ تراکنش
-    ->request()
-    ->clientId('5a1dca49-96bb-4318-a7cb-ebf2a6281e8e') // مقدار شناسه تراکنش در فروشگاه (باید یکتا باشد)
-    ->callbackUrl('https://mystore.ir/payment_callback') // آدرس برگشت پس از پرداخت
-    ->mobile('09123456789') // شماره موبایل مشتری - اختیاری
-    ->send();
+    $response = sama()
+                // ->token('abcd') // تعیین توکن در حین اجرا - اختیاری
+                ->amount(10000) // مبلغ تراکنش
+                ->request()
+                ->clientId('0a1dca49-96bb-4318-a7cb-ebf2a6281003') // مقدار شناسه تراکنش در فروشگاه (باید یکتا باشد)
+                ->callbackUrl('http://localhost:8000/api/payment_callback') // آدرس برگشت پس از پرداخت
+                ->mobile('09123456789') // شماره موبایل مشتری - اختیاری
+                ->send();
 
-if (!$response->success()) {
-    return $response->error()->message();
-}
+    if (!$response->success()) {
+        return [
+            $response->error()->code(),
+            $response->error()->detail(),
+            $response->error()->message(),
+            $response->error()->extra()
+        ];
+    }
 
-// ذخیره اطلاعات در دیتابیس
-// هدایت مشتری به درگاه پرداخت
+    // ذخیره اطلاعات در دیتابیس
+    // ...
+    // هدایت مشتری به درگاه پرداخت
 
-return $response->redirect();
+    return $response->redirect();
 
 ```
 
 ### بررسی وضعیت تراکنش | Verify payment status
 
 ```php
-$requestId = request()->query('request_id'); // دریافت کوئری استرینگ ارسال شده توسط سما
-$price = request()->query('price'); // دریافت کوئری استرینگ ارسال شده توسط سما
-$resultCode = request()->query('result_code'); // دریافت کوئری استرینگ ارسال شده توسط سما
-$message = request()->query('message'); // دریافت کوئری استرینگ ارسال شده توسط سما
+    $requestId = request()->query('request_id'); // دریافت کوئری استرینگ ارسال شده توسط سما
+    $price = request()->query('price'); // دریافت کوئری استرینگ ارسال شده توسط سما
+    $resultCode = request()->query('result_code'); // دریافت کوئری استرینگ ارسال شده توسط سما
+    $processId = request()->query('process_id'); // دریافت کوئری استرینگ ارسال شده توسط سما
 
-$clientId = '5a1dca49-96bb-4318-a7cb-ebf2a6281e8e';
+    $savedPriceInDb = 10000;
+    $clientId = '0a1dca49-96bb-4318-a7cb-ebf2a6281003';
 
-if ($resultCode == 0 && $price == $savedPriceInDb) { // Successful payment, lets verify with Sama Gateway
+    if ($resultCode != 0 || $price != $savedPriceInDb) {
+        return ["status" => "failed", "message" => "پرداخت ناموفق"];
+    }
+
+    // Successful payment, lets verify with Sama Gateway
     $response = sama()
-        ->token('abcd') // تعیین توکن در حین اجرا - اختیاری
-        ->verification()
-        ->requestId($requestId)
-        ->clientId($clientId)
-        ->send();
-}
+                // ->token('abcd') // تعیین توکن در حین اجرا - اختیاری
+                ->verification()
+                ->requestId($requestId)
+                ->clientId($clientId)
+                ->send();
 
-if (!$response->success() || $response->isPaid === false) {
-    return $response->error()->message(); // or loop through $response->error->extras to get detailed error messages
-}
+    if (!$response->success() || $response->isPaid() === false) {
+        // $response->error()->code(),
+        // $response->error()->detail(),
+        return ["status" => "failed", "message" => "پرداخت ناموفق"];
+    }
 
-// پرداخت موفقیت آمیز بود
+    // پرداخت موفقیت آمیز بود
 
-echo $response->isPaid // === true means successful payment
+    echo $response->isPaid(); // === true means successful payment
+    echo $response->paymentId();
+    echo $response->requestId();
 
+    // دریافت شماره پیگیری تراکنش و انجام امور مربوط به دیتابیس
 
-echo $response->paymentId();
-echo $response->requestId();
+    // Save referenceNumber and transactionCode in the database
+    echo $response->referenceNumber();
+    echo $response->transactionCode();
 
-// دریافت شماره پیگیری تراکنش و انجام امور مربوط به دیتابیس
-
-echo $response->referenceNumber();
-echo $response->transactionCode();
+    return ["status" => "ok", "message" => "پرداخت موفق"];
 ```

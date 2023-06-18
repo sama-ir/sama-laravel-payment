@@ -40,7 +40,7 @@ class VerificationResponse
     /** @var string|null */
     private $transactionCode;
 
-    public function __construct(array $result)
+    public function __construct(int $statusCode, array $result)
     {
         $this->statusCode = $statusCode;
 
@@ -54,9 +54,9 @@ class VerificationResponse
             $this->referenceNumber = $result['payment']['reference_number'];
             $this->transactionCode = $result['payment']['transaction_code'];
         } else {
-            $this->code = $result["code"];
-            $this->detail = $result["detail"];
-            $this->extras = $result["extras"];
+            $this->code = $result["status"];
+            $this->detail = $result["error"];
+            // $this->extras = $result["extras"];
         }
     }
 

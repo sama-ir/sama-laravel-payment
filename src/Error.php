@@ -4,40 +4,40 @@ namespace TosanSoha\Sama;
 
 class Error
 {
-    /** @var string */
+    /** @var string|null */
     private $code;
 
-    /** @var string */
+    /** @var string|null */
     private $detail;
 
-    /** @var array */
-    private $extras;
+    /** @var array|null */
+    private $extra;
 
-    public function __construct(string $code, string $detail, array $extras)
+    public function __construct(string $code, string|null $detail, array $extra=null)
     {
         $this->code = $code;
         $this->detail = $detail;
-        $this->extras = $extras;
+        $this->extra = $extra;
     }
 
-    public function code(): string
+    public function code(): string|null
     {
         return $this->code;
     }
 
-    public function detail(): string
+    public function detail(): string|null
     {
         return $this->detail;
     }
 
-    public function extras(): array
+    public function extra(): array|null
     {
-        return $this->extras;
+        return $this->extra;
     }
 
     public function message(): string
     {
-        if (isset($this->detail) && ! empty($this->detail)) {
+        if (! self::isSnakeCase($this->detail) && isset($this->detail) && ! empty($this->detail)) {
             return $this->detail;
         }
         switch ($this->code) {
@@ -45,8 +45,14 @@ class Error
                 return 'خطای اعتبارسنجی توکن پرداخت، لطفا با تیم پیشتیبانی سما تماس بگیرید.';
             case 'validation_error':
                 return 'مقادیر وارد شده معتبر نیست.';
+            case '40016':
+                return 'مقدار شماره سفارش (client id) ارسال شده تکراری است.';
             default:
                 return 'خطای پیش بینی نشده‌ای رخ داده است.';
         }
+    }
+
+    public static function isSnakeCase($str) {
+        return preg_match('/^[a-z]+(_[a-z]+)*$/', $str);
     }
 }

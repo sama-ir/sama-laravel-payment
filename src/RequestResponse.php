@@ -16,7 +16,7 @@ class RequestResponse
     private $detail;
 
     /** @var array */
-    private $extras;
+    private $extra;
 
     /** @var string */
     private $paymentReqId;
@@ -24,17 +24,20 @@ class RequestResponse
     /** @var string */
     private $webViewLink;
 
-    public function __construct(array $result, int $statusCode)
+    public function __construct(int $statusCode, array $result)
     {
         $this->statusCode = $statusCode;
 
+        // dd($result);
         if ($this->success()) {
             $this->paymentReqId = $result["uid"];
             $this->webViewLink = $result["web_view_link"];
         } else {
             $this->code = $result["code"];
             $this->detail = $result["detail"];
-            $this->extras = $result["extras"];
+            if (isset($result["extra"])){
+                $this->extra = $result["extra"];
+            }
         }
     }
 
@@ -62,6 +65,6 @@ class RequestResponse
 
     public function error(): Error
     {
-        return new Error($this->code, $this->detail, $this->extras);
+        return new Error($this->code, $this->detail, $this->extra);
     }
 }

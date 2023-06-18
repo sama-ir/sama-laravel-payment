@@ -2,6 +2,6 @@
 
 return [
 
-    'token' => env('SAMA_GATEWAY_TOKEN', 'abcd'),
+    'token' => env('SAMA_GATEWAY_TOKEN', 'Your Sama token'),
 
 ];

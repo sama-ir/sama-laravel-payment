@@ -40,10 +40,10 @@ class Request
 
         $response = Http::asJson()
                   ->acceptJson()
-                  ->withHeaders(['Authorization': 'Api-Key '.$this->token,])
+                  ->withHeaders(['Authorization'=> 'Api-Key '.$this->token,])
                   ->post($url, $data);
 
-        return new RequestResponse($response->json());
+        return new RequestResponse($response->status(), $response->json());
     }
 
     public function clientId(string $clientId): self

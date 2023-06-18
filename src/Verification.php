@@ -30,11 +30,11 @@ class Verification
         ];
 
         $response = Http::asJson()
-                  ->acceptJson()
-                  ->withHeaders(['Authorization': 'Api-Key '.$this->token,])
-                  ->post($url, $data);
+                    ->acceptJson()
+                    ->withHeaders(['Authorization'=> 'Api-Key '.$this->token,])
+                    ->post($url, $data);
 
-        return new VerificationResponse($response->json());
+        return new VerificationResponse($response->status(), $response->json());
     }
 
     public function clientId(string $clientId): self
