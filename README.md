@@ -21,7 +21,7 @@ Add your token to .env file
 توکن خود را اضافه کنید
 
 ```dotenv
-SAMA_GATEWAY_TOEKN=abcd
+SAMA_GATEWAY_TOKEN=abcd
 ```
 
 You can also set token at runtime.
