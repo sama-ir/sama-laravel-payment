@@ -63,15 +63,16 @@ You can also set token at runtime.
 ### بررسی وضعیت تراکنش | Verify payment status
 
 ```php
-    $requestId = request()->query('request_id'); // دریافت کوئری استرینگ ارسال شده توسط سما
-    $price = request()->query('price'); // دریافت کوئری استرینگ ارسال شده توسط سما
-    $resultCode = request()->query('result_code'); // دریافت کوئری استرینگ ارسال شده توسط سما
-    $processId = request()->query('process_id'); // دریافت کوئری استرینگ ارسال شده توسط سما
+    $price = request()->post('price'); // دریافت پارامتر ارسال شده توسط سما
+    $requestId = request()->post('request_id'); // دریافت پارامتر ارسال شده توسط سما
+    $resultCode = request()->post('result_code'); // دریافت پارامتر ارسال شده توسط سما
+    $processId = request()->post('process_id'); // دریافت پارامتر ارسال شده توسط سما
 
     $savedPriceInDb = 10000;
     $clientId = '0a1dca49-96bb-4318-a7cb-ebf2a6281003';
 
     if ($resultCode != 0 || $price != $savedPriceInDb) {
+        // Payment was not successful or someone tampered with the data
         return ["status" => "failed", "message" => "پرداخت ناموفق"];
     }
 
@@ -86,6 +87,10 @@ You can also set token at runtime.
     if (!$response->success() || $response->isPaid() === false) {
         // $response->error()->code(),
         // $response->error()->detail(),
+        return ["status" => "failed", "message" => "پرداخت ناموفق"];
+    }
+    if($savedPriceInDb != $response->$price) {
+        // Someone tampered with the data, prices do not match
         return ["status" => "failed", "message" => "پرداخت ناموفق"];
     }
 
