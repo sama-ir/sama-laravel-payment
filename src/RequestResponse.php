@@ -7,22 +7,22 @@ use Illuminate\Http\RedirectResponse;
 class RequestResponse
 {
     /** @var int */
-    public $statusCode;
+    private $statusCode;
 
     /** @var string */
-    public $code;
+    private $code;
 
     /** @var string */
-    public $detail;
+    private $detail;
 
     /** @var array */
-    public $extra;
+    private $extra;
 
     /** @var string */
-    public $paymentReqId;
+    private $paymentReqId;
 
     /** @var string */
-    public $webViewLink;
+    private $webViewLink;
 
     public function __construct(int $statusCode, array $result)
     {
@@ -62,6 +62,16 @@ class RequestResponse
 
         return $url ? redirect($url) : null;
     }
+
+    public function paymentReqId(){
+
+        if (! $this->success()) {
+            return '';
+        }
+        
+        return $this->paymentReqId;
+    }
+    
 
     public function error(): Error
     {
