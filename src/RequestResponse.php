@@ -63,6 +63,16 @@ class RequestResponse
         return $url ? redirect($url) : null;
     }
 
+    public function paymentReqId(){
+
+        if (! $this->success()) {
+            return '';
+        }
+        
+        return $this->paymentReqId;
+    }
+    
+
     public function error(): Error
     {
         return new Error($this->code, $this->detail, $this->extra);
