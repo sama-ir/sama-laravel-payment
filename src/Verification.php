@@ -22,7 +22,7 @@ class Verification
 
     public function send(): VerificationResponse
     {
-        $url = 'https://api.sama.com/api/stores/services/deposits/guaranteed/payment/verify/';
+        $url = 'https://app.sama.ir/api/stores/services/deposits/guaranteed/payment/verify/';
 
         $data = [
             'request_id' => $this->requestId,
