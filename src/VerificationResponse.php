@@ -25,7 +25,7 @@ class VerificationResponse
     /** @var int */
     private $fee;
 
-    /** @var boolean */
+    /** @var bool */
     private $isPaid;
 
     /** @var string|null */
@@ -53,17 +53,20 @@ class VerificationResponse
             $this->requestId = $result['payment']['request_id'];
             $this->referenceNumber = $result['payment']['reference_number'];
             $this->transactionCode = $result['payment']['transaction_code'];
+        } elseif (400 == $statusCode) {
+            $this->code = $result['code'];
+            $this->detail = $result['detail'];
         } else {
-            $this->code = $result["status"];
-            $this->detail = $result["error"];
+            $this->code = $result['status'];
+            $this->detail = $result['error'];
             // $this->extras = $result["extras"];
         }
     }
 
     public function success(): bool
     {
-        return $this->statusCode === 201 ||
-               $this->statusCode === 200;
+        return 201 === $this->statusCode
+               || 200 === $this->statusCode;
     }
 
     public function paymentReqId(): string

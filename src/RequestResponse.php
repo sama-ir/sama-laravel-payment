@@ -30,26 +30,30 @@ class RequestResponse
 
         // dd($result);
         if ($this->success()) {
-            $this->paymentReqId = $result["uid"];
-            $this->webViewLink = $result["web_view_link"];
+            $this->paymentReqId = $result['uid'];
+            $this->webViewLink = $result['web_view_link'];
         } else {
-            $this->code = $result["code"];
-            $this->detail = $result["detail"];
-            if (isset($result["extra"])){
-                $this->extra = $result["extra"];
+            if (isset($result['code'])) {
+                $this->code = $result['code'];
+            } else {
+                $this->code = $statusCode;
+            }
+            $this->detail = $result['detail'];
+            if (isset($result['extra'])) {
+                $this->extra = $result['extra'];
             }
         }
     }
 
     public function success(): bool
     {
-        return $this->statusCode === 201 ||
-               $this->statusCode === 200;
+        return 201 === $this->statusCode
+               || 200 === $this->statusCode;
     }
 
     public function url(): string
     {
-        if (! $this->success()) {
+        if (!$this->success()) {
             return '';
         }
 
@@ -63,15 +67,14 @@ class RequestResponse
         return $url ? redirect($url) : null;
     }
 
-    public function paymentReqId(){
-
-        if (! $this->success()) {
+    public function paymentReqId()
+    {
+        if (!$this->success()) {
             return '';
         }
-        
+
         return $this->paymentReqId;
     }
-    
 
     public function error(): Error
     {
